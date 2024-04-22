@@ -1,50 +1,69 @@
 #include<iostream>
-#include<C:\Users\User\OneDrive\Desktop\DSL MOCK\practice\stackk.cpp>
 using namespace std;
-int prec(char c){
-    if(c == '/' || c == '*'){
-        return 2;
+class Q{
+    public:
+    int queue[20];
+    int rear ,front;
+    int size;
+    Q(){
+        size=5;
+        for (int i =0;i<size;i++){
+            queue[i] = 0;
+        }
+        rear = -1;
+        front = -1;
     }
-    else if(c == '+' || c == '-'){
-        return 1;
-    }
-    else{
-        return -1;
-    }
-}
 
-string infix(string s){
-    string res;
-    stackADT stk;
-    for(int i=0;i<s.length();i++){
-        if((s[i] >= 'a' && s[i]<='z') || (s[i] >= 'A' && s[i]<='Z')){
-            res+= s[i];
-        }
-        else if(s[i] == '('){
-            stk.push(s[i]);
-        }
-        else if(s[i] == ')'){
-            while(!stk.isEmpty() && stk.peek() != '('){
-                res += stk.pop();
-            }
-            if(!stk.isEmpty()){
-                stk.pop();
-            }
-        }
-        else{
-            if(!stk.isEmpty() and prec(stk.peek()) > prec(s[i])){
-                res+= stk.pop();
-            }
-            stk.push(s[i]);
+    void insertRear(int x){
+        if(rear != size-1){
+            rear++;
+            queue[rear] = x;
+            cout << "INserted \n";
         }
     }
-    while(!stk.isEmpty()){
-        res+=stk.pop();
+    void insertFront(int x){
+        if(front != -1){
+            queue[front] = x;
+            front--;
+            cout << "INserted \n";
+        }
     }
-    return res;
 
-}
+    void deleteFront(){
+        if(front!=rear){
+            front++;
+            queue[front] = 0;
+            cout << "Deleted\n";
+        }
+    }
+    void deleteRear(){
+        if(rear!=front){
+            queue[rear] = 0;
+            rear--;
+            cout << "Deleted\n";
+        }
+    }
+    void display(){
+        for (int i=0;i<size;i++){
+            cout << queue[i] << " | ";
+        }
+        cout << endl;
+    }
+};
 int main()
 {
-    cout << infix("(a-b/c)*(a/k-l)") << endl;
+    Q a;
+    a.insertRear(10);
+    a.insertRear(20);
+    a.insertRear(30);
+    a.insertRear(40);
+    a.insertRear(50);
+    a.display();
+    a.deleteFront();
+    a.display();
+    a.insertFront(40);
+    a.display();
+    a.deleteRear();
+    a.display();
+    return 0;
 }

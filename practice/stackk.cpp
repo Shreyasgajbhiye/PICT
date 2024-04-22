@@ -1,55 +1,42 @@
 #include<iostream>
 using namespace std;
-class node{
-    public:
-    node *next;
+class Node{
     char data;
+    Node *next;
 };
 class stackADT{
-    public:
-    node* head;
-        stackADT(){
-            head = NULL;
-        }
+    Node* head;
+    stackADT(){
+        head = NULL;
+    }
 
-        bool isEmpty(){
-            if (head == NULL){
-                return true;
-            }
-            else{
-                return false;
-            }
+    bool isEmpty(){
+        if(head==NULL){
+            return true;
         }
+        return false;
+    }
 
-        void push(char v){
-            node *temp = new node;
-            if (temp == NULL){
-                cout << "OVERFLOW ";
-            }
-            else{
-                temp->data = v;
-                temp->next = head;
-                head = temp;
-            }
+    void push(char ch){
+        Node * temp = new Node;
+        if(temp == NULL){
+            cout << "OVERLOW";
         }
+        temp->data = ch;
+        temp->next = head;
+        head= temp;
+    }
 
-        char pop(){
-            if(!isEmpty()){
-                char ch = head->data;
-                node* temp = head;
-                head = head->next;
-                delete temp;
-                return ch;
+    char pop(){
+        Node *temp;
+        char ch = head->data;
+        temp = head;
+        head = head->next;
+        delete temp;
+        return ch;
+    }
 
-            }
-            return '\0';
-        }
-        char peek(){
-            if(!isEmpty()){
-                
-                return head->data;
-            }
-            return '\0';
-        }
-
+    char peek(){
+        return head->data;
+    }
 };

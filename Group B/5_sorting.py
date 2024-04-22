@@ -28,20 +28,20 @@ def insertionSort(arr):
         arr[j+1] = key
     print(arr)
 
-def shellSort(arr):
-    n = len(arr)
-    gap = n//2                                      # // means truncate
-    while gap > 0:
-        for i in range(gap, n):
-            current_ele = arr[i] 
-            pos = i
-            while pos>=gap and current_ele < arr[pos-gap]:
-                arr[pos]  = arr[pos-gap]
-                pos = pos-gap
+        def shellSort(arr):
+            n = len(arr)
+            gap = n//2                                      # // means truncate
+            while gap > 0:
+                for i in range(gap, n):
+                    current_ele = arr[i] 
+                    pos = i
+                    while pos>=gap and current_ele < arr[pos-gap]:
+                        arr[pos]  = arr[pos-gap]
+                        pos = pos-gap
 
-            arr[pos] = current_ele
-        gap = gap//2
-    print (arr)
+                    arr[pos] = current_ele
+                gap = gap//2
+            print (arr)
 
 
 arr=[10,40,30,20,90,3,0]
