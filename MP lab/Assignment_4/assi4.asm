@@ -1,185 +1,129 @@
-%macro scall 4
-        mov eax,%1
-        mov ebx,%2
-        mov ecx,%3
-        mov edx,%4
-        int 80h
+%macro print 2
+    mov rax,01
+    mov rdi,01
+    mov rsi,%1
+    mov rdx,%2
+    syscall
 %endmacro
 
+%macro read 2
+    mov rax,00
+    mov rdi,00
+    mov rsi,%1
+    mov rdx,%2
+    syscall
+%endmacro
+
+%macro exit 0
+    mov rax, 60
+    mov rdi, 0
+    syscall
+%endmacro exit
+
 section .data
-        arr dq 0000003h,00000003h
-        n equ 2
+m1 db 10, "Result : ", 10, 13
+l1 equ $-m1
 
-        menu db 10d,13d,"**********MENU**********"
-             db 10d,13d,"1. Addition"
-             db 10d,13d,"2. Subtraction"
-             db 10d,13d,"3. Multiplication"
-             db 10d,13d,"4. Division"
-             db 10d,13d,"5. Exit"
-             db 10d,13d,"Enter your Choice: "
-        menu_len equ $-menu
+m2 db 10, "Enter Your Choice : ", 10, 13
+l2 equ $-m2
 
-        m1 db 10d,13d,"Addition: "
-        l1 equ $-m1
-        m2 db 10d,13d,"Substraction: "
-        l2 equ $-m2
-        m3 db 10d,13d,"Multiplication: "
-        l3 equ $-m3
-        m4 db 10d,13d,"Division: "
-        l4 equ $-m4
-  
-	
+
+menu db "1. Addition", 10
+   db "2. Subtraction", 10
+   db "3. Multiplication", 10
+   db "4. Division", 10
+   db "5. Exit", 10
+
+len_menu equ $-menu
+
+n1 db 20
+n2 db 02
+
 section .bss
-        answer resb 8 ;to store the result of operation
-        choice resb 2
-
+choice resb 05
+result resb 32
 section .text
-        global _start:
-        _start:
 
-        up: scall 4,1,menu,menu_len
-         scall 3,0,choice,2 
-	
-        cmp byte[choice],'1'
-        je case1
-        cmp byte[choice],'2'
-        je case2
-        cmp byte[choice],'3'
-        je case3
-        cmp byte[choice],'4'
-        je case4
-        cmp byte[choice],'5'
-        je case5
+global _start
+_start:
 
-	
-	
-        case1: scall 4,1,m1,l1
-                call addition
-                jmp up 
-  
-        case2: scall 4,1,m2,l2
-         call substraction
-         jmp up
+up:
+mov rax, 0h
+mov rbx, 0h
 
-        case3: scall 4,1,m3,l3
-         call multiplication
-         jmp up
+print menu, len_menu
+print m2, l2
 
-        case4: scall 4,1,m4,l4
-         call division
-         jmp up
-	
-        case5: mov eax,1
-         mov ebx,0
-                int 80h 
-  
-  
-	
-;procedures for arithmetic and logical operations 
-addition:
-        mov ecx,n
-        dec ecx 
-        mov esi,arr
-        mov eax,[esi]
-up1: add esi,8
-        mov ebx,[esi]
-        add eax,ebx
-        loop up1 
-        call display
-ret
-	
-	
-substraction:
-	
-        mov ecx,n
-        dec ecx 
-        mov esi,arr
-        mov eax,[esi]
-up2: add esi,8
-        mov ebx,[esi]
-        sub eax,ebx
-        loop up2 
-        call display 
-ret
-  
-  
-multiplication:
-        mov ecx,n
-        dec ecx 
-        mov esi,arr
-        mov eax,[esi]
-up3: add esi,8
-        mov ebx,[esi]
-        mul ebx
-        loop up3 
-        call display
-ret 
+read choice, 1
 
-division:
-        mov ecx,n
-        dec ecx
-	
-        mov esi,arr
-        mov eax,[esi]
-up4: add esi,8
-        mov ebx,[esi]
-        mov edx,0
-        div ebx
-        loop up4 
-        call display
-ret
+cmp byte[choice], "1"
+je plus
 
-or:
-        mov ecx,n
-        dec ecx 
-        mov esi,arr
-        mov eax,[esi]
-up6: add esi,8
-        mov ebx,[esi]
-        or eax,ebx
-        loop up6 
-        call display
-ret
+cmp byte[choice], "2"
+je minus
 
-xor:
-        mov ecx,n
-        dec ecx 
-        mov esi,arr
-        mov eax,[esi]
-up7: add esi,8
-        mov ebx,[esi]
-        xor eax,ebx
-        loop up7 
-        call display
-ret
+cmp byte[choice], "3"
+je multiply
 
-and:
-        mov ecx,n
-        dec ecx 
-        mov esi,arr
-        mov eax,[esi]
-up8: add esi,8
-        mov ebx,[esi]
-        and eax,ebx
-        loop up8
-        call display
-ret
+cmp byte[choice], "4"
+je divide
 
+cmp byte[choice], "5"
+je exit
+
+
+plus:
+mov rax, [n1]
+mov rbx, [n2]
+add rax, rbx
+call display
+exit
+
+minus:
+mov rax, [n1]
+mov rbx, [n2]
+sub rax, rbx
+call display
+exit
+
+multiply:
+mov al, [n1]
+mov bl, [n2]
+mul bl
+call display
+exit
+
+divide:
+xor rax, rax
+xor rdx, rdx
+mov al, [n1]
+mov bl, [n2]
+
+div bl
+call display
+exit
 
 display:
-        mov esi,answer+7
-        mov ecx,8
+mov rbx, rax
+mov rdi, result
+mov cx, 2
 
-cnt: mov edx,0
-        mov ebx,16
-        div ebx
-        cmp dl,09h
-        jbe add30
-        add dl,07h
-add30: add dl,30h
-        mov [esi],dl
-        dec esi
-        dec ecx
-        jnz cnt
-        scall 4,1,answer,8
+convert:
+rol bl, 04
+mov al, bl
+and al, 0fh
+cmp al, 09h
+jle add_30
+add al, 07h
+
+add_30:
+add al, 30h
+
+mov [rdi], al
+inc rdi
+dec cx
+jnz convert
+
+print m1, l1
+print result, 8
 ret

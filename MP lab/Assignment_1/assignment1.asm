@@ -1,61 +1,45 @@
-
-
-
-
-; Assignment  
-
-
 section .data
-     msg1 db "Accept five 64 bit Number ",10
-     len1 equ $-msg1
-     msg2 db "Display five 64 bit number",10
-     len2 equ $-msg2
+msg1 db 10,13 "Enter 5 numbers :"
+len1 equ $-msg1
+msg2 db 10,13 "% numbers are : "
+len2 equ $-msg2
 
 section .bss
-     array resd 200
-     counter resb 1
+counter resb 1
+array resd 200
 
 section .text
 global _start
 _start:
-	mov rax,1
-	mov rdi,1
-	mov rsi,msg1
-	mov rdx,len1
-	syscall
-      
-mov byte[counter],05
-mov rbx,00
 
+mov byte[counter], 05
+mov rbx, 00
+loop:
+mov rax, 0
+mov rdi, 0
+mov rsi, array
+add rsi, rbx
+mov rdx, 17
+syscall
+add rsi, 17
+dec byte[counter]
+jnz loop
+
+
+mov byte[counter], 05
+mov rbx, 00
 loop1:
-        mov rax,0
-	mov rdi,0
-	mov rsi,array
-	add rsi,rbx
-	mov rdx,17
-	syscall
-     	add rbx,17
-      	dec byte[counter]
-      	JNZ loop1
-     
-        mov rax,1
-    	mov rdi,1
-    	mov rsi,msg2
-    	mov rdx,len2
-    	syscall
+mov rax, 1
+mov rdi, 1
+mov rsi, array
+add rsi, rbx
+mov rdx, 17
+syscall
+add rsi, 17
+dec byte[counter]
+jnz loop1
 
-mov rbx,00
-loop2:
-        mov rax,1                    
-        mov rdi, 1                    
-    	mov rsi, array                
-    	add rsi,rbx
-    	mov rdx,17                
-    	syscall
-        add rbx,17
-        dec byte[counter]
-        JNZ loop2
-                
-mov rax,60
-mov rdi,00
+
+mov rax, 60
+mov rdi,0
 syscall
