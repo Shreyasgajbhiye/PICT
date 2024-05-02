@@ -44,8 +44,7 @@ mov rsi,array
 
 Up:
 mov rax, [rsi]
-bt rax, 7
-jc neg
+js neg
 inc byte[pcount]
 jmp Down
 
@@ -79,7 +78,7 @@ display:
 	mov byte[totalcount], 00
 
 loop:
-        rol bh,04
+      rol bh,04
 	mov al,bh
 	and al,0fH
 	cmp al,09h

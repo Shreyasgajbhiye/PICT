@@ -13,7 +13,6 @@ global _start
 _start:
 
 mov byte[counter], 05
-mov rbx, 00
 loop:
 mov rax, 0
 mov rdi, 0
@@ -32,7 +31,6 @@ loop1:
 mov rax, 1
 mov rdi, 1
 mov rsi, array
-add rsi, rbx
 mov rdx, 17
 syscall
 add rsi, 17

@@ -42,6 +42,7 @@ n2 db 02
 section .bss
 choice resb 05
 result resb 32
+
 section .text
 
 global _start
