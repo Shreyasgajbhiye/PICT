@@ -34,11 +34,7 @@ _start:
 
 ; Recursive factorial function
 factorial:
-    ; Check if the input is 0 or 1 (base case)
-    cmp     byte [rdi], 0
-    je      .base_case
-    cmp     byte [rdi], 1
-    je      .base_case
+     
 
     ; Decrement the input argument
     dec     byte [rdi]

@@ -153,6 +153,7 @@ sub37:
 sub al,07h      
 sub30:  
 sub al,30h
+
 add bx,ax      
 inc rsi    
 loop next_digit

@@ -1,140 +1,134 @@
+%MACRO PRINT 2
+    MOV RAX, 1
+    MOV RDI, 1
+    MOV RSI, %1
+    MOV RDX, %2
+    SYSCALL
+%ENDMACRO PRINT
+
+%MACRO EXIT 0
+    MOV RAX, 60
+    MOV RDI, 0
+    SYSCALL
+%ENDMACRO EXIT
+
 section .data
-title :
-    db 10, "=====values of GDTR,LDTR,IDTR====="
-title_len equ $-title
+    MSG1 DB 10, "GDTR :- "
+    LEN1 EQU $-MSG1
+    MSG2 DB 10, "IDTR :- "
+    LEN2 EQU $-MSG2
+    MSG3 DB 10, "LDTR :- "
+    LEN3 EQU $-MSG3
+    MSG4 DB 10, "TR :- "
+    LEN4 EQU $-MSG4
+    MSG5 DB 10, "MSW :- "
+    LEN5 EQU $-MSG5
+    MSG6 DB 10, "CPUID :- "
+    LEN6 EQU $-MSG6
 
-gdtmsg db 10, "2) GDT value : "
-gmsg_len equ $-gdtmsg
-
-ldtmsg db 10, "3) LDT value : "                                                  
-lmsg_len equ $-ldtmsg
-
-idtmsg db 10, "4) IDT value : "
-imsg_len equ $-idtmsg
-
-trmsg db 10, "5) TR value : "
-trmsg_len equ $-trmsg
-
-mswmsg db 10, "6) MSW value : "
-mswmsg_len equ $-mswmsg
-colmsg db ":"
-
-rmodemsg db 10, "1) Processor In : Real Mode"
-rmsg_len equ $-rmodemsg
-
-pmodemsg db 10, "1) Processor In : Protected Mode"
-pmsg_len equ $-pmodemsg
-
-end db 10, "======================================",10
-end_len equ $-end
-
+    MSG7 DB 10, "The CPU is in Protected Mode"
+    LEN7 EQU $-MSG7
+    MSG8 DB 10, "The CPU is not in Protected Mode"
+    LEN8 EQU $-MSG8
 section .bss
-    gdt resd 1
-    resw 1
-    ldt resw 1
-    idt resd 1
-    resw 1
-    tr resw 1
-    msw resw 1  
-    dnum_buff resb 04
-    cr0_data resd 1
+    GDTR_DATA RESB 6
+    IDTR_DATA RESB 6
+    LDTR_DATA RESB 2
+    TR_DATA RESB 2
+    MSW_DATA RESB 4
+    CPU_DATA RESB 4
 
-%macro display 2
-    mov eax,4
-    mov ebx,1
-    mov ecx,%1
-    mov edx,%2
-    int 80h
-%endmacro
- 
+    DATA RESB 16
 section .text
-global _start
+    global _start
+
 _start:
-    display title,title_len
-    smsw eax                      
-    mov [cr0_data],eax
-    ror eax,1                        
-    jc prmode
-    display rmodemsg,rmsg_len
-    jmp nxt1
-   
-prmode:    
-    display pmodemsg,pmsg_len
 
-nxt1:    
-    sgdt [gdt]
-    sldt [ldt]
-    sidt [idt]
-    str [tr]
-    smsw [msw]
-    display gdtmsg,gmsg_len
+    XOR EAX, EAX
 
-    mov bx,[gdt+4]
-    call display_num
-    display colmsg,1
+    CPUID
+    MOV [CPU_DATA], EAX
 
-    mov bx,[gdt+2]
-    call display_num
-    display colmsg,1
+    SMSW EAX
+    MOV [MSW_DATA], EAX
 
-    mov bx,[gdt]
-    call display_num
-     
-    display ldtmsg,lmsg_len
-    mov bx,[ldt]
-    call display_num
-    display idtmsg,imsg_len
-       
-    mov bx,[idt+4]
-    call display_num
-    display colmsg,1
+    SGDT [GDTR_DATA]
+    SIDT [IDTR_DATA]
+    SLDT [LDTR_DATA]
+    STR [TR_DATA]
 
-    mov bx,[idt+2]
-    call display_num
-    display colmsg,1
-     
-    mov bx,[idt]
-    call display_num
-   
-    display trmsg,trmsg_len
-    mov bx,[tr]
-    call display_num
+    PRINT MSG5, LEN5
 
-    display mswmsg,mswmsg_len
-    mov bx,[msw]
-    call display_num
-    display end,end_len
+    MOV AX, [MSW_DATA+2]
+    CALL DISPLAY 
+    MOV AX, [MSW_DATA]
+    CALL DISPLAY
 
-exit:    
-    mov eax,01
-    mov ebx,00
-    int 80h
+    PRINT MSG6, LEN6
 
-display_num:
-    mov esi,dnum_buff        
-    mov ch,04                        
-    mov cl,04                        
+    MOV AX, [CPU_DATA+2]
+    CALL DISPLAY 
+    MOV AX, [CPU_DATA]
+    CALL DISPLAY
 
-up1:
-    rol bx,cl                      
-    mov dl,bl                        
-    and dl,0fh                      
-    add dl,30h                      
-    cmp dl,39h                      
-    jbe skip1                        
-    add dl,07h                      
+    PRINT MSG1, LEN1
 
-skip1:
-    mov [esi],dl                    
-    inc esi                            
-    dec ch                            
-    jnz up1                          
-     
-    mov eax,4                        
-    mov ebx,1
-    mov ecx,dnum_buff
-    mov edx,4
-    int 80h
-    ret
-	
+    MOV AX , [GDTR_DATA+4]
+    CALL DISPLAY
+    MOV AX , [GDTR_DATA+2]
+    CALL DISPLAY
+    MOV AX , [GDTR_DATA]
+    CALL DISPLAY
 
+    PRINT MSG2, LEN2
+    
+    MOV AX , [IDTR_DATA+4]
+    CALL DISPLAY
+    MOV AX , [IDTR_DATA+2]
+    CALL DISPLAY
+    MOV AX , [IDTR_DATA]
+    CALL DISPLAY
+
+    PRINT MSG3, LEN3
+
+    MOV AX , [LDTR_DATA]
+    CALL DISPLAY
+
+    PRINT MSG4, LEN4
+    
+    MOV AX , [TR_DATA]
+    CALL DISPLAY
+
+    MOV EAX, [MSW_DATA]
+    BT EAX, 0
+    JC DOWN1
+
+    PRINT MSG8, LEN8
+DOWN1:
+    PRINT MSG7, LEN7
+    
+    EXIT
+
+DISPLAY:
+mov bx, ax
+mov rdi, DATA
+mov cx, 4
+
+convert:
+rol bl, 04
+mov al, bl
+and al, 0fh
+cmp al, 09h
+jle add_30
+add al, 07h
+
+add_30:
+add al, 30h
+
+mov [rdi], al
+inc rdi
+dec cx
+jnz convert
+
+PRINT DATA, 16
+ret
