@@ -1,126 +1,79 @@
-#include<iostream>
+// C++ program for implementation of Heap Sort
+#include <iostream>
 using namespace std;
-class Heap{
-    int arr[100];
-    int size;
-    public:
-    Heap(){
-        arr[0] = -1;
-        size = 0;
-    }
-    void insert(int val){
-        size = size+1;
-        int index = size;
-        arr[index] = val;
 
-        while(index > 1){
-            int parent = index/2;
+// To heapify a subtree rooted with node i which is
+// an index in arr[]. n is size of heap
+void heapify(int arr[], int n, int i)
+{
+	int largest = i; // Initialize largest as root Since we are using 0 based indexing
+	int l = 2 * i + 1; // left = 2*i + 1
+	int r = 2 * i + 2; // right = 2*i + 2
 
-            if(arr[parent] < arr[index]){
-                swap(arr[parent], arr[index]);
-                index = parent;
-            }
-            else{
-                return;
-            }
-        }
-    }
+	// If left child is larger than root
+	if (l < n && arr[l] > arr[largest])
+		largest = l;
 
-    void print(){
-        for(int i=1; i<=size;i++){
-            cout << arr[i] << " ";
-        }
+	// If right child is larger than largest so far
+	if (r < n && arr[r] > arr[largest])
+		largest = r;
 
-        cout << endl;
-    }
+	// If largest is not root
+	if (largest != i) {
+		swap(arr[i], arr[largest]);
 
-    void deletefromHeap(){
-        if(size == 0){
-            cout << "Nothing to delete \n";
-            return;
-        }
+		// Recursively heapify the affected sub-tree
+		heapify(arr, n, largest);
+	}
+}
 
-        arr[1] = arr[size];
-        size--;
+// main function to do heap sort
+void heapSort(int arr[], int n)
+{
+	// Build heap (rearrange array)
+	for (int i = n / 2 - 1; i >= 0; i--)
+		heapify(arr, n, i);
 
-        int i = 1;
-        while(1<size){
-            int left = i*2;
-            int right = i*2+1;
+	// One by one extract an element from heap
+	for (int i = n - 1; i >= 0; i--) {
+		// Move current root to end
+		swap(arr[0], arr[i]);
 
-            if(left<size && arr[left] > arr[i]){
-                swap(arr[i], arr[left]);
-                i = left;
-            }
-            else  if(right<size && arr[right] > arr[i]){
-                swap(arr[i], arr[right]);
-                i = right;
-            }
-            else{
-                return;
-            }
-        }
-    }
+		// call max heapify on the reduced heap
+		heapify(arr, i, 0);
+	}
+}
 
-    void heapify( int arr[], int n , int i){
-        int largest = i;
-        int left = 2*1;
-        int right = i*2+1;
+/* A utility function to print array of size n */
+void printArray(int arr[], int n)
+{
+	for (int i = 0; i < n; ++i)
+		cout << arr[i] << " ";
+	cout << "\n";
+}
 
-        if(left<= n && arr[largest] < arr[left]){
-            largest = left;
-        }
-        if(right<= n && arr[largest] < arr[right]){
-            largest = right;
-        }
-
-        if(largest != i){
-            swap(arr[largest], arr[i]);
-            heapify(arr, n, largest);
-        }
-    }
-
-    void heapSort(int arr[], int n){
-        int size = n;
-        while(size > 1){
-            swap(arr[size], arr[1]);
-            size--;
-
-
-            heapify(arr,size,1);
-        }
-
-    }
-};
+// Driver program
 int main()
 {
-    Heap a;
-    a.insert(50);
-    a.insert(55);
-    a.insert(53);
-    a.insert(52);
-    a.insert(54);
-    a.print();
-    a.deletefromHeap();
-    a.print();
-    int arr[6] = {-1, 54, 53 , 55, 52, 50};
-    int n = 5;
-    for(int i = n/2; i>0;i--){
-        a.heapify(arr, 6, 1);
-    }
-    cout << "Printing heap" << endl;
-    for(int i = 1; i<=n;i++){
-        cout << arr[i] << " ";
-    }
-    cout << endl;
+	int arr[] = { 60 ,20 ,40 ,70, 30, 10};
+	int n = sizeof(arr) / sizeof(arr[0]);
+//heapify algorithm
+// the loop must go reverse you will get after analyzing manually 
+// (i=n/2 -1) because other nodes/ ele's are leaf nodes 
+// (i=n/2 -1) for 0 based indexing
+// (i=n/2) for 1 based indexing
+	for(int i=n/2 -1;i>=0;i--){
+	heapify(arr,n,i);
+}
 
-    a.heapSort(arr, n);
+cout << "After heapifying array is \n";
+	printArray(arr, n);
 
-    cout << "Sorted arr : " << endl;
-    for(int i = 1; i<=n;i++){
-        cout << arr[i] << " ";
-    }
-    cout << endl;
-    
-    return 0;
+
+	heapSort(arr, n);
+
+	cout << "Sorted array is \n";
+	printArray(arr, n);
+	
+return 0;
 }
