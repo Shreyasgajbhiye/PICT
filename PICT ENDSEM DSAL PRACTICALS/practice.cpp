@@ -1,113 +1,136 @@
-#include<bits/stdc++.h>
+#include<iostream>
 using namespace std;
 class node{
     public:
-    node* next;
-    int dest;
+    node* left;
+    node* right;
+    int data;
+    bool rbit, lbit;
+
+    node(){
+        this->data = 0;
+        this->rbit = 0;
+        this->lbit = 0;
+        this->left = NULL;
+        this->right = NULL;
+    }
+    node(int data){
+        this->data = data;
+        this->rbit = 0;
+        this->lbit = 0;
+        this->left = NULL;
+        this->right = NULL;
+    }
+
+    void print(){
+        cout << this->lbit << "-> " << this->data << " <-" << this->rbit << endl;
+    }
+
+    friend class TBST;
 };
-class Graph{
+
+class TBST{
+    node* head, *root;
     public:
-    node** adjList;
-    string * places;
-    int count;
-
-    int getIndex(string str){
-        for(int i=0;i<count;i++){
-            if(places[i] == str) return i;
-        }
-        return -1;
+    TBST(){
+        head = root = NULL;
     }
-    Graph(){
-        cout << "ENter the number of nodes : " << endl;
-        cin >> count;
 
-        adjList = new node*[count];
-        places = new string[count];
+    void insert(int key){
+        if(root==NULL){
+            head = new node(-9999);
+            head->right = head;
 
-        for(int i=0;i<count;i++){
-            adjList[i] = NULL;
+            root = new node(key);
+            head->left = root;
+            head->lbit = 1;
+            root->left = head;
+            root->right  = head;
+            return;
         }
-        for(int i=0;i<count;i++){
-           cout << "Enter the place for " << i+1 << endl;
-           cin>> this->places[i];
-        }
 
-        for(int i=0;i<count;i++){
-            int j=0;
-            int cnt;
-            cout << "Enter the adjacency for " << places[i] << endl;
-            cin >> cnt;
+        node* parent  = root;
+        node *newNode = new node(key);
 
-            while(j<cnt){
-                string str;
-                cout << "Enter for places : " << endl;
-                cin >> str;
-
-                int index = getIndex(str);
-
-                node* n = new node;
-                n->dest = index;
-
-                node* ptr = adjList[i];
-                n->next  = ptr;
-                adjList[i] = n;
-                
-                j++;
+        while(true){
+            if(parent->data > key){
+                if(parent->lbit == 1){
+                parent = parent->left;
             }
-        }
-    }
-
-    void display(){
-        for(int i=0;i<count;i++){
-            string str;
-            str = places[i];
-            cout << str << " -> ";
-
-            node* ptr = adjList[i];
-            while(ptr != NULL){
-                cout << places[ptr->dest] << " ";
-                ptr = ptr->next;
+            else{
+                newNode->left = parent->left;
+                newNode->right = parent;
+                parent->left = newNode;
+                parent->lbit = 1;
+                return;
             }
-
-            cout << "-> NULL" << endl;
-        }
-
-    }
-
-    void bfs(int src){
-        bool *visited = new bool[count];
-        for(int i=0;i<count;i++){
-            visited[i] = false;
-        }
-        visited[src] = true;
-        deque<int> dq;
-
-        dq.push_back(src);
-        while(!dq.empty()){
-            int curr = dq.front();
-            dq.pop_front();
-
-            cout << places[curr] << " ";
-            visited[curr] = true;
-
-            node* ptr = adjList[curr];
-            while(ptr != NULL){
-                int neigh = ptr->dest;
-                if(!visited[neigh]){
-                    visited[neigh] = true;
-                    dq.push_back(neigh);
+            }
+            else if(parent->data < key){
+                if(parent->rbit == 1){
+                    parent = parent->right;
                 }
-                ptr= ptr->next;
+                else{
+                    newNode->right = parent->right;
+                    newNode->left = parent;
+
+                    parent->right = newNode;
+                    parent->rbit = 1;
+                    return;
+                }
             }
         }
-         cout << endl;
+    }
 
+    void inorder(){
+        node* temp = root;
+        while(temp->lbit ==1){
+            temp = temp->left;
+        }
+
+        while(temp!=head){
+            temp->print();
+            if(temp->rbit ==1 ){
+                temp = temp->right;
+
+                while(temp->lbit == 1){
+                    temp = temp->left;
+                }
+            }
+            else{
+                temp = temp->right;
+            }
+        }
+        cout << endl;
+    }
+
+
+    void preorder(){
+        bool flag =0;
+        node* temp = root;
+        while(temp != head){
+            if(flag == 0){
+                temp->print();
+            }
+            if(flag == 0 && temp->lbit == 1){
+                temp= temp->left;
+            }
+            else{
+                flag = temp->rbit == 0 ? 1 : 0;
+                temp = temp->right;
+            }
+        }
     }
 };
+
+
 int main()
 {
-    Graph *g = new Graph;
-    g->display();
-    g->bfs(2);
+    TBST obj;
+    obj.insert(20);
+    obj.insert(2);
+    obj.insert(5);
+    obj.insert(30);
+    obj.inorder();
+    obj.preorder();
     return 0;
 }
